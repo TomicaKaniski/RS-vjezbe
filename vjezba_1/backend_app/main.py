@@ -1,3 +1,5 @@
+# Run with: uvicorn main:app --reload --port 8000
+
 import os
 
 import logging
