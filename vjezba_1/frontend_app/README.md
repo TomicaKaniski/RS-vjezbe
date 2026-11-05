@@ -2,4 +2,4 @@
 
 Jednostavna statična frontend aplikacija za prikaz vremenske prognoze.
 
-**Render URL:** https://rs-vjezbe-vjezbe-1-frontend-app.onrender.com
+**Render URL:** https://rs-vjezbe-vjezba-1-frontend-app-tk.onrender.com
