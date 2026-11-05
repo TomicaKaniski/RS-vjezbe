@@ -25,9 +25,11 @@
       width: 100%;
       max-width: 600px;
       padding: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+
       border-radius: 22px;
       background: white;
-      box-shadow: 0 15px 45px rgba(36, 91, 137, 0.15);
+      box-shadow: 0 20px 60px rgba(36, 91, 137, 0.18);
     }
 
     h1 {
@@ -53,17 +55,29 @@
     .icon {
       margin: 14px 0 4px;
       font-size: 72px;
+      filter: drop-shadow(0 5px 8px rgba(36, 91, 137, 0.15));
+      transition: transform 0.3s ease;
+    }
+
+    .icon:hover {
+      transform: scale(1.1);
     }
 
     .temperatura {
       font-size: 58px;
       font-weight: bold;
       line-height: 1.2;
+      letter-spacing: -2px;
+
     }
 
     .opis {
-      margin: 5px 0 0;
-      color: #668099;
+      display: inline-block;
+      padding: 7px 14px;
+      border-radius: 12px;
+      background: #fff4e5;
+      color: #a65b00;
+      font-size: 13px;
     }
 
     .detalji {
@@ -118,6 +132,8 @@
     .gradovi {
       text-align: center;
       margin-top: 20px;
+      font-weight: 600;
+      transition: all 0.2s ease;
     }
 
     .gradovi button {
@@ -131,7 +147,16 @@
     }
 
     .gradovi button:hover {
-      background: #bbdefb;
+      background: #2476c7;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(36, 118, 199, 0.2);
+    }
+
+    .gradovi button.aktivan {
+      background: #2476c7;
+      color: white;
+      box-shadow: 0 3px 8px rgba(36, 118, 199, 0.25);
     }
   </style>
 </head>
@@ -164,7 +189,7 @@
     </section>
 
     <p id="status-backenda" class="backend-status">
-      Povezivanje...
+      ⏳ Dohvaćam prognozu...
     </p>
 
     <footer>Svaka sličnost sa stvarnim vremenom je gotovo sigurno sasvim slučajna.</footer>
@@ -198,8 +223,18 @@
 
         gumb.textContent = grad;
 
+        if (grad === "Zagreb") {
+          gumb.classList.add("aktivan");
+        }
+
         gumb.addEventListener("click", function () {
-          document.getElementById("grad").textContent = grad + ", HR";
+
+          document.querySelectorAll(".gradovi button").forEach(function (g) {
+            g.classList.remove("aktivan");
+          });
+
+          gumb.classList.add("aktivan");
+
           prikaziVrijeme(grad);
         });
 
