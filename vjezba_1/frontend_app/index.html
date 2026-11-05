@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="hr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vremenska prognoza</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -27,14 +30,41 @@
       box-shadow: 0 15px 45px rgba(36, 91, 137, 0.15);
     }
 
-    h1 { margin: 0 0 6px; font-size: 26px; }
-    .subtitle { margin: 0 0 24px; color: #668099; }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+    }
 
-    .vrijeme { text-align: center; padding: 20px 0 14px; }
-    .grad { margin: 10px 0 0; font-size: 22px; }
-    .icon { margin: 14px 0 4px; font-size: 72px; }
-    .temperatura { font-size: 58px; font-weight: bold; line-height: 1.2; }
-    .opis { margin: 5px 0 0; color: #668099; }
+    .subtitle {
+      margin: 0 0 24px;
+      color: #668099;
+    }
+
+    .vrijeme {
+      text-align: center;
+      padding: 20px 0 14px;
+    }
+
+    .grad {
+      margin: 10px 0 0;
+      font-size: 22px;
+    }
+
+    .icon {
+      margin: 14px 0 4px;
+      font-size: 72px;
+    }
+
+    .temperatura {
+      font-size: 58px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .opis {
+      margin: 5px 0 0;
+      color: #668099;
+    }
 
     .detalji {
       display: grid;
@@ -45,21 +75,80 @@
       border-bottom: 1px solid #e3edf5;
       text-align: center;
     }
-    .detalji strong { display: block; margin-bottom: 6px; font-size: 18px; }
-    .detalji span { color: #668099; font-size: 13px; }
 
-    footer { margin-top: 18px; text-align: center; font-size: 12px; color: #668099; }
+    .detalji strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+
+    .detalji span {
+      color: #668099;
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: #668099;
+    }
 
     @media (max-width: 420px) {
-      .card { padding: 24px 18px; }
-      .detalji strong { font-size: 16px; }
+      .card {
+        padding: 24px 18px;
+      }
+
+      .detalji strong {
+        font-size: 16px;
+      }
+    }
+
+    .backend-status {
+      display: table;
+      margin: 20px auto;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .gradovi {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .gradovi button {
+      margin: 4px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 15px;
+      background: #e3f2fd;
+      color: #1565c0;
+      cursor: pointer;
+    }
+
+    .gradovi button:hover {
+      background: #bbdefb;
     }
   </style>
 </head>
+
 <body>
   <main class="card">
-    <h1><center>Vremenska prognoza</center></h1>
-    <p class="subtitle"><center>Prikazuje trenutno vrijeme... kako ne bismo morali gledati kroz prozor.</center></p>
+    <h1>
+      <center>Vremenska prognoza</center>
+    </h1>
+    <p class="subtitle">
+      <center>Prikazuje trenutno vrijeme... kako ne bismo morali gledati kroz prozor.</center>
+    </p>
+
+    <div class="gradovi">
+      <p>Odaberi grad:</p>
+      <div id="popis-gradova"></div>
+    </div>
 
     <section class="vrijeme">
       <h2 class="grad" id="grad">Zagreb, HR</h2>
@@ -74,7 +163,95 @@
       <div><strong id="vjetar">12 km/h</strong><span>Vjetar</span></div>
     </section>
 
+    <p id="status-backenda" class="backend-status">
+      Povezivanje...
+    </p>
+
     <footer>Svaka sličnost sa stvarnim vremenom je gotovo sigurno sasvim slučajna.</footer>
   </main>
+
+  <script>
+    async function provjeriBackend() {
+      const odgovor = await fetch("https://rs-vjezbe-vjezba-1-backend-app-tk.onrender.com/api/health");
+      const podaci = await odgovor.json();
+      console.log(podaci);
+
+      document.getElementById("status-backenda").textContent =
+        podaci.status === "ok"
+          ? "🟢 API povezan"
+          : "🔴 API nedostupan";
+    }
+
+    async function dohvatiGradove() {
+
+      const odgovor = await fetch(
+        "https://rs-vjezbe-vjezba-1-backend-app-tk.onrender.com/api/cities"
+      );
+
+      const podaci = await odgovor.json();
+
+      const popis = document.getElementById("popis-gradova");
+
+      podaci.cities.forEach(function (grad) {
+
+        const gumb = document.createElement("button");
+
+        gumb.textContent = grad;
+
+        gumb.addEventListener("click", function () {
+          document.getElementById("grad").textContent = grad + ", HR";
+          prikaziVrijeme(grad);
+        });
+
+        popis.appendChild(gumb);
+
+      });
+    }
+
+    async function prikaziVrijeme(grad) {
+
+      try {
+        const url = "https://rs-vjezbe-vjezba-1-backend-app-tk.onrender.com/api/weather?city="
+          + encodeURIComponent(grad);
+
+        const odgovor = await fetch(url);
+        const podaci = await odgovor.json();
+
+        if (!odgovor.ok) {
+          throw new Error(podaci.detail);
+        }
+
+        document.getElementById("grad").textContent =
+          podaci.city + ", " + podaci.country;
+
+        document.getElementById("temperatura").textContent =
+          podaci.temperature + "°C";
+
+        document.getElementById("osjecaj").textContent =
+          podaci.feels_like + "°";
+
+        document.getElementById("vlaga").textContent =
+          podaci.humidity + "%";
+
+        document.getElementById("vjetar").textContent =
+          podaci.wind + " km/h";
+
+        document.getElementById("opis").textContent =
+          podaci.source === "demo"
+            ? "⚠️ Demonstracijski podaci"
+            : "Stvarna vremenska prognoza";
+
+      } catch (greska) {
+        console.error("Greška pri dohvaćanju vremena:", greska);
+
+        document.getElementById("opis").textContent =
+          "Prognoza trenutno nije dostupna.";
+      }
+    }
+
+    provjeriBackend();
+    dohvatiGradove();
+  </script>
 </body>
+
 </html>

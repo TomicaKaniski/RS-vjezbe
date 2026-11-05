@@ -5,6 +5,7 @@ import logging
 import httpx
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -20,6 +21,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+DUMMY_WEATHER = {
+    "Zagreb": {"temperature": 18, "feels_like": 17, "humidity": 62, "wind": 12, "weather_code": 2},
+    "Pula":   {"temperature": 23, "feels_like": 24, "humidity": 55, "wind": 8,  "weather_code": 0},
+    "Rijeka": {"temperature": 20, "feels_like": 19, "humidity": 78, "wind": 18, "weather_code": 3},
+    "Split":  {"temperature": 25, "feels_like": 26, "humidity": 48, "wind": 10, "weather_code": 1},
+    "Osijek": {"temperature": 16, "feels_like": 14, "humidity": 70, "wind": 15, "weather_code": 61},
+}
 
 @app.get("/")
 def home():
@@ -67,21 +75,24 @@ async def weather(city: str = Query(default="Zagreb", min_length=2, max_length=8
             forecast.raise_for_status()
             current = forecast.json()["current"]
 
-    except (
-        httpx.RequestError,
-        httpx.HTTPStatusError,
-        ValueError,
-        KeyError,
-        TypeError
-    ) as exc:
-        logger.exception("Open-Meteo error for city=%s", city)
+    except (httpx.RequestError, httpx.HTTPStatusError, ValueError, KeyError, TypeError) as exc:
 
-        raise HTTPException(
-            status_code=502,
-            detail="Servis za vremensku prognozu trenutno nije dostupan."
-    ) from exc
+        logger.warning("Open-Meteo unavailable: %s", exc)
+
+        if city not in DUMMY_WEATHER:
+            raise HTTPException(status_code=503, detail="Nema podataka za ovaj grad.")
+
+        return {
+            "source": "demo",
+            "city": city,
+            "country": "HR",
+            **DUMMY_WEATHER[city],
+            "is_day": True,
+            "updated_at": datetime.now().isoformat(timespec="minutes")
+        }
 
     return {
+        "source": "open-meteo",
         "city": place["name"],
         "country": place.get("country_code", ""),
         "temperature": current["temperature_2m"],
@@ -90,5 +101,5 @@ async def weather(city: str = Query(default="Zagreb", min_length=2, max_length=8
         "wind": current["wind_speed_10m"],
         "weather_code": current["weather_code"],
         "is_day": bool(current["is_day"]),
-        "updated_at": current["time"],
+        "updated_at": current["time"]
     }
