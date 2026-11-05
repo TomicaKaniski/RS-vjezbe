@@ -1,8 +1,12 @@
 import os
 
+import logging
+
 import httpx
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+
+logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(title="Vremenska prognoza API", version="1.0.0")
 render_origin = "https://rs-vjezbe-vjezba-1-frontend-app-tk.onrender.com"
@@ -63,8 +67,19 @@ async def weather(city: str = Query(default="Zagreb", min_length=2, max_length=8
             forecast.raise_for_status()
             current = forecast.json()["current"]
 
-    except (httpx.RequestError, httpx.HTTPStatusError, ValueError, KeyError, TypeError) as exc:
-        raise HTTPException(status_code=502, detail="Servis za vremensku prognozu trenutno nije dostupan.") from exc
+    except (
+        httpx.RequestError,
+        httpx.HTTPStatusError,
+        ValueError,
+        KeyError,
+        TypeError
+    ) as exc:
+        logger.exception("Open-Meteo error for city=%s", city)
+
+        raise HTTPException(
+            status_code=502,
+            detail="Servis za vremensku prognozu trenutno nije dostupan."
+    ) from exc
 
     return {
         "city": place["name"],
