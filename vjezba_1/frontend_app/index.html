@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vremenska prognoza</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      color: #19314a;
+      background: linear-gradient(145deg, #cde9ff, #eef8ff);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 600px;
+      padding: 32px;
+      border-radius: 22px;
+      background: white;
+      box-shadow: 0 15px 45px rgba(36, 91, 137, 0.15);
+    }
+
+    h1 { margin: 0 0 6px; font-size: 26px; }
+    .subtitle { margin: 0 0 24px; color: #668099; }
+
+    .vrijeme { text-align: center; padding: 20px 0 14px; }
+    .grad { margin: 10px 0 0; font-size: 22px; }
+    .icon { margin: 14px 0 4px; font-size: 72px; }
+    .temperatura { font-size: 58px; font-weight: bold; line-height: 1.2; }
+    .opis { margin: 5px 0 0; color: #668099; }
+
+    .detalji {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 18px 0;
+      border-top: 1px solid #e3edf5;
+      border-bottom: 1px solid #e3edf5;
+      text-align: center;
+    }
+    .detalji strong { display: block; margin-bottom: 6px; font-size: 18px; }
+    .detalji span { color: #668099; font-size: 13px; }
+
+    footer { margin-top: 18px; text-align: center; font-size: 12px; color: #668099; }
+
+    @media (max-width: 420px) {
+      .card { padding: 24px 18px; }
+      .detalji strong { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1><center>Vremenska prognoza</center></h1>
+    <p class="subtitle"><center>Prikazuje trenutno vrijeme... kako ne bismo morali gledati kroz prozor.</center></p>
+
+    <section class="vrijeme">
+      <h2 class="grad" id="grad">Zagreb, HR</h2>
+      <div class="icon" id="icon">⛅</div>
+      <div class="temperatura" id="temperatura">18°C</div>
+      <p class="opis" id="opis">Vrijeme je <b>djelomično oblačno</b>.</p>
+    </section>
+
+    <section class="detalji">
+      <div><strong id="osjecaj">17°</strong><span>Osjećaj</span></div>
+      <div><strong id="vlaga">62%</strong><span>Vlažnost</span></div>
+      <div><strong id="vjetar">12 km/h</strong><span>Vjetar</span></div>
+    </section>
+
+    <footer>Svaka sličnost sa stvarnim vremenom je gotovo sigurno sasvim slučajna.</footer>
+  </main>
+</body>
+</html>
