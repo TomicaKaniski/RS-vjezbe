@@ -42,12 +42,6 @@ asyncio.run(main())
 # Nakon trećeg isteka odmah javlja neuspjeh.
 
 ### OUTPUT:
-# Pokušaj 3 čeka 0.1:
-# Pokušaj 1 je istekao!
-# Pokušaj 2 je istekao!
-# Pokušaj 3 je uspio.
-# Brzina je 54 km/h.
-
 # Pokušaj 3 čeka 0.8:
 # Pokušaj 1 je istekao!
 # Pokušaj 2 je istekao!
